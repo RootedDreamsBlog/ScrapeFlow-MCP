@@ -13,7 +13,7 @@ An implementation of the **Model Context Protocol (MCP)** that gives AI Agents t
 3. Install Playwright: `playwright install chromium`
 4. Run the server: `python server.py`
 
-## 1.How to use with Claude Desktop
+## 1. How to use with Claude Desktop
 Add this to your `claude_desktop_config.json`:
 ```json
 {
