@@ -1,39 +1,51 @@
 from mcp.server.fastmcp import FastMCP
-from playwright.async_api import async_playwright
-from bs4 import BeautifulSoup
+from scraper import WebScout
 
-# Initialize FastMCP - this name appears in the AI interface
+# Initialize FastMCP
 mcp = FastMCP("ScrapeFlow")
+scout = WebScout()
 
 @mcp.tool()
-async def search_and_summarize(url: str) -> str:
+async def search_and_summarize(
+        url: str,
+        max_chars: int = 5000,
+        include_metadata: bool = True
+) -> str:
     """
-    Scrapes a specific URL and returns a cleaned summary of the content.
-    Useful for providing real-time web context to the LLM.
+    Scrapes a specific URL and returns cleaned content.
+
+    Args:
+        url: The webpage URL to scrape
+        max_chars: Maximum characters to return (default 5000)
+        include_metadata: Whether to include URL and length info
+
+    Returns:
+        Cleaned text content from the webpage
     """
-    async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
-        page = await browser.new_page()
+    # Validate URL format
+    if not url.startswith(('http://', 'https://')):
+        return "Error: URL must start with http:// or https://"
 
-        try:
-            # Navigate to the URL
-            await page.goto(url, wait_until="networkidle", timeout=30000)
+    try:
+        # Call the modular scraper
+        text = await scout.get_clean_content(url)
 
-            # Get content and clean it with BeautifulSoup
-            content = await page.content()
-            soup = BeautifulSoup(content, "html.parser")
+        # Check if scraping failed
+        if text.startswith("Scraping Error:"):
+            return text
 
-            # Remove non-content tags
-            for tag in soup(["script", "style", "nav", "footer", "header"]):
-                tag.decompose()
+        # Limit characters for LLM context window efficiency
+        truncated_text = text[:max_chars]
 
-            text = soup.get_text(separator=" ", strip=True)
-            return text[:5000] # Limit characters for LLM context window efficiency
+        # Add metadata if requested
+        if include_metadata:
+            metadata = f"Content from {url} (Total: {len(text)} chars, Showing: {len(truncated_text)} chars)\n\n"
+            return metadata + truncated_text
 
-        except Exception as e:
-            return f"Failed to scrape {url}: {str(e)}"
-        finally:
-            await browser.close()
+        return truncated_text
+
+    except Exception as e:
+        return f"Unexpected error while processing {url}: {str(e)}"
 
 if __name__ == "__main__":
     mcp.run()

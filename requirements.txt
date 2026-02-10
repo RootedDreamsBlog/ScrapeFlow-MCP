@@ -1,0 +1,4 @@
+fastmcp
+playwright
+beautifulsoup4
+lxml
