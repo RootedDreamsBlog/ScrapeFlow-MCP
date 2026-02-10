@@ -302,3 +302,5 @@ If you run into problems:
     - Steps you've already tried
 
 Happy scraping!
+
+This project is part of a deep-dive tutorial on my blog: [https://www.rooteddreams.net/web-scraping-mcp-guide/]
