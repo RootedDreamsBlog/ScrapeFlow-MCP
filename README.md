@@ -1,5 +1,8 @@
 # ScrapeFlow-MCP
 
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 An implementation of the **Model Context Protocol (MCP)** that gives AI Agents like Claude the ability to scrape and interpret live web data with high precision.
 
 ## Features
